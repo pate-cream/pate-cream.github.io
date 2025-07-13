@@ -1,0 +1,53 @@
+[
+  {
+    "collectionName": "Collection 1",
+    "items": [
+      {
+        "name": "Strawberries Crepe",
+        "description": "Nutella & Fresh Strawberries Crepe",
+        "price": "9.95",
+        "image": "images/Crepe.jpg"
+      },
+      {
+        "name": "Bananas Waffle",
+        "description": "Nutella & Bananas Waffle.",
+        "price": "9.45",
+        "image": "images/Waffle.jpg"
+      }
+    ]
+  },
+  {
+    "collectionName": "Collection 2",
+    "items": [
+      {
+        "name": "Strawberries Crepe",
+        "description": "Nutella & Fresh Strawberries Crepe",
+        "price": "9.95",
+        "image": "images/Crepe.jpg"
+      },
+      {
+        "name": "Bananas Waffle",
+        "description": "Nutella & Bananas Waffle.",
+        "price": "9.45",
+        "image": "images/Waffle.jpg"
+      }
+    ]
+  },
+  {
+    "collectionName": "Collection 3",
+    "items": [
+      {
+        "name": "Strawberries Crepe",
+        "description": "Nutella & Fresh Strawberries Crepe",
+        "price": "9.95",
+        "image": "images/Crepe.jpg"
+      },
+      {
+        "name": "Bananas Waffle",
+        "description": "Nutella & Bananas Waffle.",
+        "price": "9.45",
+        "image": "images/Waffle.jpg"
+      }
+    ]
+  }
+]
