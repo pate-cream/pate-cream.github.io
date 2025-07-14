@@ -1,28 +1,69 @@
 document.addEventListener('DOMContentLoaded', () => {
     const menuContainer = document.getElementById('menu-container');
-    const collectionNav = document.getElementById('collection-nav');
+    const collectionNavSidebar = document.getElementById('collection-nav-sidebar');
+    const collectionNavHorizontal = document.getElementById('collection-nav-horizontal');
     const hamburgerMenu = document.querySelector('.hamburger-menu');
     const closeMenu = document.querySelector('.close-menu');
     const sidebarMenu = document.getElementById('sidebar-menu');
 
-    let allMenuData = []; // Store the full menu data globally
-    let currentView = 'all'; // Track the currently selected view ('all' or specific collection name)
+    let allMenuData = [];
+    let currentView = 'all'; // Keep track of the currently selected view
 
-    // Function to toggle the sidebar menu visibility
     function toggleSidebar() {
         sidebarMenu.classList.toggle('open');
     }
 
-    // Event listeners for hamburger and close buttons
     hamburgerMenu.addEventListener('click', toggleSidebar);
     closeMenu.addEventListener('click', toggleSidebar);
 
-    // Close sidebar when a navigation link is clicked (for mobile)
-    collectionNav.addEventListener('click', (event) => {
-        if (event.target.tagName === 'A') {
-            toggleSidebar(); // Close the sidebar after a link is clicked
+    // Event listener for navigation clicks (delegated to parent ul)
+    function handleNavigationClick(event) {
+        event.preventDefault();
+        const clickedLink = event.target;
+
+        if (clickedLink.tagName !== 'A') return;
+
+        // Remove 'active' class from all links in BOTH navs
+        document.querySelectorAll('#collection-nav-sidebar a, #collection-nav-horizontal a').forEach(link => {
+            link.classList.remove('active');
+        });
+
+        const selectedCollectionName = clickedLink.dataset.collection; // e.g., "All Items" or "Collection 1"
+        const normalizedSelectedCollectionName = selectedCollectionName.toLowerCase(); // e.g., "all items" or "collection 1"
+
+        currentView = selectedCollectionName; // Keep original for display if needed (e.g., in breadcrumbs or other UI)
+
+        // Add 'active' class to the clicked link in BOTH navs
+        // We still use the original selectedCollectionName here to match the data-collection attribute
+        document.querySelectorAll(`[data-collection="${selectedCollectionName}"]`).forEach(link => {
+            link.classList.add('active');
+        });
+
+        // Close sidebar if clicked from sidebar on mobile
+        if (event.currentTarget.id === 'collection-nav-sidebar') {
+            toggleSidebar();
         }
-    });
+
+        // *** هذا هو الجزء المعدّل والمهم ***
+        if (normalizedSelectedCollectionName === 'all items') { // يجب أن نقارن بـ 'all items' لأن data-collection="All Items" تحول إلى 'all items'
+            console.log('--- Handling "All Items" click (normalized) ---');
+            console.log('Passing allMenuData:', allMenuData);
+            displayMenu(allMenuData, 'all'); // viewType يبقى 'all' ليتطابق مع المنطق السابق
+        } else {
+            console.log(`--- Handling "${selectedCollectionName}" click ---`);
+            const filteredCollection = allMenuData.filter(
+                // هنا يجب أن نقارن collection.collectionName بـ selectedCollectionName الأصلية (Case-sensitive as per data)
+                // أو إذا كنا نود مقارنة غير حساسة لحالة الأحرف دائماً، نستخدم toLowerCase() على collection.collectionName أيضاً
+                collection => collection.collectionName === selectedCollectionName
+            );
+            console.log('Filtered data:', filteredCollection);
+            displayMenu(filteredCollection, selectedCollectionName);
+        }
+    }
+
+    collectionNavSidebar.addEventListener('click', handleNavigationClick);
+    collectionNavHorizontal.addEventListener('click', handleNavigationClick);
+
 
     async function fetchMenuData() {
         try {
@@ -30,9 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            allMenuData = await response.json(); // Store fetched data
-            populateNavigation(allMenuData);
-            displayMenu(allMenuData, 'all'); // Initially display all items, collapsed by default
+            allMenuData = await response.json();
+            console.log('Data fetched successfully:', allMenuData);
+            populateNavigation(allMenuData); // Populate navs initially
+            displayMenu(allMenuData, 'all'); // Display all items (collapsed) on initial load
         } catch (error) {
             console.error('Error fetching menu data:', error);
             menuContainer.innerHTML = '<p>Sorry, we could not load the menu at this time. Please try again later.</p>';
@@ -40,78 +82,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function populateNavigation(menuData) {
-        collectionNav.innerHTML = ''; // Clear existing nav items
+        // Clear both navigation lists
+        collectionNavSidebar.innerHTML = '';
+        collectionNavHorizontal.innerHTML = '';
 
-        // Add "All Items" link
-        const allItemsLi = document.createElement('li');
-        const allItemsLink = document.createElement('a');
-        allItemsLink.href = '#';
-        allItemsLink.textContent = 'All Items';
-        allItemsLink.classList.add('active'); // Set 'All Items' as active by default
-        allItemsLink.dataset.collection = 'all'; // Custom data attribute to identify
-        allItemsLi.appendChild(allItemsLink);
-        collectionNav.appendChild(allItemsLi);
-
-        // Add links for each collection
-        menuData.forEach(collection => {
+        // Helper function to create a navigation link
+        function createNavLink(collectionName) {
             const li = document.createElement('li');
             const link = document.createElement('a');
             link.href = '#';
-            link.textContent = collection.collectionName;
-            link.dataset.collection = collection.collectionName; // Store collection name in data attribute
-            li.appendChild(link);
-            collectionNav.appendChild(li);
-        });
+            link.textContent = collectionName;
+            link.dataset.collection = collectionName; // This correctly sets data-collection="All Items"
 
-        // Add event listener for navigation clicks
-        collectionNav.addEventListener('click', (event) => {
-            event.preventDefault(); // Prevent default link behavior (page refresh)
-            const clickedLink = event.target;
-
-            // Ensure a link was clicked, not whitespace in the ul
-            if (clickedLink.tagName !== 'A') return;
-
-            // Remove 'active' class from all links
-            document.querySelectorAll('#collection-nav a').forEach(link => {
-                link.classList.remove('active');
-            });
-
-            // Add 'active' class to the clicked link
-            clickedLink.classList.add('active');
-
-            const selectedCollectionName = clickedLink.dataset.collection;
-            currentView = selectedCollectionName; // Update current view
-
-            if (selectedCollectionName === 'all') {
-                // For "All Items", all collections will be displayed and collapsed initially
-                displayMenu(allMenuData, 'all');
-            } else {
-                // For specific collection, display only that one and it should be expanded
-                const filteredCollection = allMenuData.filter(
-                    collection => collection.collectionName === selectedCollectionName
-                );
-                displayMenu(filteredCollection, selectedCollectionName);
+            // Set 'active' class based on the currentView
+            if (collectionName === 'All Items' && currentView === 'all') {
+                link.classList.add('active');
+            } else if (collectionName === currentView) {
+                link.classList.add('active');
             }
+            li.appendChild(link);
+            return li;
+        }
+
+        // Add "All Items" to both navigation lists
+        collectionNavSidebar.appendChild(createNavLink('All Items'));
+        collectionNavHorizontal.appendChild(createNavLink('All Items'));
+
+
+        // Add links for each collection to both navigation lists
+        menuData.forEach(collection => {
+            collectionNavSidebar.appendChild(createNavLink(collection.collectionName));
+            collectionNavHorizontal.appendChild(createNavLink(collection.collectionName));
         });
     }
 
-    // Pass 'viewType' to control the display behavior
     function displayMenu(menuData, viewType) {
-        menuContainer.innerHTML = ''; // Clear current menu display
-
+        menuContainer.innerHTML = '';
+        console.log('Displaying menu. Received menuData:', menuData, 'View type:', viewType);
         if (!menuData || menuData.length === 0) {
+            console.warn("No menu data to display or filtered data is empty.", menuData);
             menuContainer.innerHTML = '<p>No menu items available at the moment.</p>';
             return;
         }
 
         menuData.forEach(collection => {
-            let isExpandedInitially = false; // Default to collapsed
+            let isExpandedInitially = false;
 
-            // If we are in 'all items' view, all collections should be collapsed
-            // If we are in a specific collection view, that single collection should be expanded
             if (viewType === 'all') {
                 isExpandedInitially = false; // All collections collapsed in 'All Items' view
-            } else if (collection.collectionName === viewType) {
+            } else if (collection.collectionName === viewType) { // This comparison needs to be case-sensitive with actual collectionName
                 isExpandedInitially = true; // The selected specific collection is expanded
             }
 
@@ -119,49 +138,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Added viewType parameter to createCollectionSection to conditionally add toggle behavior
     function createCollectionSection(collection, parentElement, isExpandedInitially, viewType) {
         const collectionDiv = document.createElement('section');
         collectionDiv.classList.add('collection');
 
-        // Create a header for the collection
         const collectionHeader = document.createElement('div');
         collectionHeader.classList.add('collection-header');
         collectionHeader.innerHTML = `<h2>${collection.collectionName}</h2>`;
 
-        // Wrapper for the dishes grid
         const dishesGridWrapper = document.createElement('div');
         dishesGridWrapper.classList.add('dishes-grid-wrapper');
 
-        // Add toggle icon and behavior ONLY if it's the 'all items' view, or a specific collapsed view
-        if (viewType === 'all') { // Only add toggle behavior for 'All Items' view
+        if (viewType === 'all') {
             const toggleIcon = document.createElement('span');
             toggleIcon.classList.add('toggle-icon');
             toggleIcon.innerHTML = '&#9660;'; // Down arrow
 
-            collectionHeader.appendChild(toggleIcon); // Add toggle icon to header
+            collectionHeader.appendChild(toggleIcon);
 
-            // Add click listener to the header to toggle the dropdown
             collectionHeader.addEventListener('click', () => {
                 dishesGridWrapper.classList.toggle('expanded');
                 toggleIcon.classList.toggle('rotated');
             });
 
-            // Set initial state for all collections in 'all items' view
-            if (!isExpandedInitially) { // If not expanded initially (which is the case for 'all items' view)
-                // Nothing needed here, as max-height:0 and no rotated class are default
-            } else {
+            if (isExpandedInitially) {
                 dishesGridWrapper.classList.add('expanded');
                 toggleIcon.classList.add('rotated');
             }
 
-        } else { // For specific collection view, it's always expanded and no toggle icon needed
+        } else {
             dishesGridWrapper.classList.add('expanded');
-            // No toggle icon or event listener needed for specific collection view
         }
 
-
-        // Common part for creating dishes grid (same as before)
         const dishesGrid = document.createElement('div');
         dishesGrid.classList.add('dishes-grid');
 
@@ -201,11 +209,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         dishesGridWrapper.appendChild(dishesGrid);
-        collectionDiv.appendChild(collectionHeader); // Add header first
-        collectionDiv.appendChild(dishesGridWrapper); // Then content wrapper
+        collectionDiv.appendChild(collectionHeader);
+        collectionDiv.appendChild(dishesGridWrapper);
         parentElement.appendChild(collectionDiv);
     }
 
-    // Call the function to fetch and display data when the page loads
     fetchMenuData();
 });
