@@ -81,18 +81,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function populateNavigation(menuData) {
-        // Clear both navigation lists
+    function populateNavigation(menuData)  {
         collectionNavSidebar.innerHTML = '';
         collectionNavHorizontal.innerHTML = '';
 
         // Helper function to create a navigation link
-        function createNavLink(collectionName) {
+        // أضفت وسيط 'isMobileHorizontal' لإنشاء الأيقونات فقط للشريط الأفقي
+        function createNavLink(collectionName, isMobileHorizontal = false) {
             const li = document.createElement('li');
             const link = document.createElement('a');
             link.href = '#';
             link.textContent = collectionName;
-            link.dataset.collection = collectionName; // This correctly sets data-collection="All Items"
+            link.dataset.collection = collectionName;
+
+            // إضافة الأيقونات بناءً على اسم الكولكشن إذا كانت للشريط الأفقي
+            if (isMobileHorizontal) {
+                let iconSrc = ''; // Default or specific icon for 'All categories'
+                if (collectionName === 'All Items') {
+                    iconSrc = 'images/col1.png'; // أيقونة لكل الفئات
+                    link.textContent = 'All categories'; // تغيير النص إلى "All categories"
+                } else if (collectionName === 'Collection 1') { // مثال: أيقونة للحلويات
+                    iconSrc = 'images/col1.png';
+                } else if (collectionName === 'Collection 2') { // مثال: أيقونة للكاسات
+                    iconSrc = 'images/col1.png';
+                }
+				else if (collectionName === 'Collection 3') { // مثال: أيقونة للكاسات
+                    iconSrc = 'images/col1.png';
+                }
+				
+                // يمكنك إضافة المزيد من الشروط هنا لكل كولكشن لديه أيقونة محددة
+
+                if (iconSrc) {
+                    const iconImg = document.createElement('img');
+                    iconImg.src = iconSrc;
+                    iconImg.alt = collectionName + ' icon';
+                    iconImg.classList.add('icon'); // أضف فئة لتطبيق الأنماط
+                    link.prepend(iconImg); // أضف الأيقونة قبل النص
+                }
+            }
+
 
             // Set 'active' class based on the currentView
             if (collectionName === 'All Items' && currentView === 'all') {
@@ -106,13 +133,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Add "All Items" to both navigation lists
         collectionNavSidebar.appendChild(createNavLink('All Items'));
-        collectionNavHorizontal.appendChild(createNavLink('All Items'));
+        // تمرير true لـ isMobileHorizontal هنا لإنشاء الأيقونات
+        collectionNavHorizontal.appendChild(createNavLink('All Items', true));
 
 
         // Add links for each collection to both navigation lists
         menuData.forEach(collection => {
             collectionNavSidebar.appendChild(createNavLink(collection.collectionName));
-            collectionNavHorizontal.appendChild(createNavLink(collection.collectionName));
+            // تمرير true لـ isMobileHorizontal هنا لإنشاء الأيقونات
+            collectionNavHorizontal.appendChild(createNavLink(collection.collectionName, true));
         });
     }
 
