@@ -11,23 +11,22 @@ body {
 header {
     background-color: #333;
     color: #fff;
-    padding: 20px; /* Adjust padding for better spacing */
+    padding: 20px;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    display: flex; /* Use flexbox for header content */
-    justify-content: space-between; /* Space out title and hamburger */
+    display: flex;
+    justify-content: space-between;
     align-items: center;
 }
 
 h1 {
     margin: 0;
-    flex-grow: 1; /* Allow title to take available space */
-    text-align: center; /* Center the title */
+    flex-grow: 1;
+    text-align: center;
 }
 
-/* Hamburger menu button for mobile */
 .hamburger-menu {
-    display: none; /* Hidden by default, shown on mobile */
+    display: none;
     background: none;
     border: none;
     color: #fff;
@@ -36,12 +35,11 @@ h1 {
     padding: 5px 10px;
 }
 
-/* Close button for side menu */
 .close-menu {
-    display: none; /* Hidden by default, shown on mobile sidebar */
+    display: none;
     background: none;
     border: none;
-    color: #333; /* Color for close button in sidebar */
+    color: #333;
     font-size: 2em;
     cursor: pointer;
     position: absolute;
@@ -53,31 +51,31 @@ h1 {
 #sidebar-menu {
     position: fixed;
     top: 0;
-    left: -250px; /* Off-screen by default */
+    left: -250px;
     width: 250px;
     height: 100%;
     background-color: #fff;
     box-shadow: 2px 0 5px rgba(0,0,0,0.2);
-    transition: left 0.3s ease; /* Smooth transition for opening/closing */
+    transition: left 0.3s ease;
     z-index: 1000;
-    padding-top: 60px; /* Space for close button */
+    padding-top: 60px;
 }
 
 #sidebar-menu.open {
-    left: 0; /* Slide in when open */
+    left: 0;
 }
 
-#collection-nav {
+#collection-nav-sidebar { /* Updated ID */
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-#collection-nav li {
+#collection-nav-sidebar li {
     border-bottom: 1px solid #eee;
 }
 
-#collection-nav a {
+#collection-nav-sidebar a {
     display: block;
     padding: 15px 20px;
     text-decoration: none;
@@ -86,11 +84,57 @@ h1 {
     transition: background-color 0.2s ease;
 }
 
-#collection-nav a:hover,
-#collection-nav a.active {
+#collection-nav-sidebar a:hover,
+#collection-nav-sidebar a.active {
     background-color: #f0f0f0;
     color: #a04000;
 }
+
+/* Mobile Horizontal Navigation Bar */
+#mobile-horizontal-nav {
+    display: none; /* Hidden by default */
+    background-color: #eee;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent items from wrapping */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    position: sticky; /* Make it sticky */
+    top: 0; /* Stick to the top of the viewport */
+    z-index: 999; /* Ensure it stays above main content but below sidebar */
+}
+
+#collection-nav-horizontal {
+    list-style: none;
+    padding: 0 10px; /* Add some padding on the sides */
+    margin: 0;
+    display: inline-flex; /* Use inline-flex to keep items in a row */
+    gap: 10px; /* Space between items */
+}
+
+#collection-nav-horizontal li {
+    flex-shrink: 0; /* Prevent items from shrinking */
+}
+
+#collection-nav-horizontal a {
+    display: block;
+    padding: 8px 15px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    border-radius: 5px;
+    background-color: #fff; /* Background for buttons */
+    border: 1px solid #ccc;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+#collection-nav-horizontal a:hover,
+#collection-nav-horizontal a.active {
+    background-color: #a04000;
+    color: #fff;
+    border-color: #a04000;
+}
+
 
 #menu-container {
     max-width: 1200px;
@@ -144,10 +188,9 @@ h1 {
     transition: max-height 0.7s ease-in; /* Faster transition when expanding */
 }
 
-
 .dishes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); /* القيمة التي تم تعديلها مسبقاً */
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
 }
 
@@ -170,8 +213,8 @@ h1 {
 }
 
 .dish-image-wrapper {
-    width: 80%; /* القيمة التي تم تعديلها مسبقاً */
-    padding-bottom: 80%; /* القيمة التي تم تعديلها مسبقاً */
+    width: 80%;
+    padding-bottom: 80%;
     margin: 0 auto;
     position: relative;
     overflow: hidden;
@@ -218,67 +261,90 @@ footer {
     margin-top: 40px;
 }
 
-/* Responsive design for smaller devices */
+/* Responsive design for smaller devices (Mobile) */
 @media (max-width: 768px) {
     .dishes-grid {
-        grid-template-columns: 1fr; /* Single column layout on small screens */
+        grid-template-columns: 1fr;
     }
 
     .hamburger-menu, .close-menu {
-        display: block; /* Show hamburger and close buttons on small screens */
+        display: block;
     }
 
-    /* Hide horizontal navigation on mobile */
-    #collection-nav {
-        display: block; /* Ensure it's block within the sidebar */
+    #sidebar-menu {
+        left: -250px; /* Ensure sidebar is off-screen initially on mobile */
+    }
+
+    /* Show horizontal navigation on mobile */
+    #mobile-horizontal-nav {
+        display: block;
+    }
+
+    /* Hide desktop horizontal navigation if it was accidentally shown by default */
+    #collection-nav-desktop { /* Assuming this ID for desktop nav from previous versions, if any */
+        display: none;
+    }
+
+    /* Adjust main content padding for sticky nav */
+    main {
+        padding-top: 0; /* Remove default padding, if any */
     }
 }
 
 /* Desktop Styles (above 768px) */
 @media (min-width: 769px) {
     header {
-        justify-content: center; /* Center header content on desktop */
+        justify-content: center;
     }
 
     .hamburger-menu {
-        display: none; /* Hide hamburger menu on desktop */
+        display: none;
     }
 
     #sidebar-menu {
-        position: static; /* Take it out of fixed positioning */
-        width: auto; /* Auto width */
-        height: auto; /* Auto height */
-        box-shadow: none; /* No shadow */
-        background-color: transparent; /* Transparent background */
+        position: static;
+        width: auto;
+        height: auto;
+        box-shadow: none;
+        background-color: transparent;
         padding-top: 0;
-        transition: none; /* No transition needed */
+        transition: none;
+        /* Desktop horizontal nav (from previous step's #collection-nav) */
+        /* Make sure it's part of the static flow */
+        order: -1; /* If you want it above the header, this might be needed in a flex/grid body setup */
     }
 
     .close-menu {
-        display: none; /* Hide close button on desktop */
+        display: none;
     }
 
-    #collection-nav {
-        display: flex; /* Make navigation horizontal */
-        justify-content: center; /* Center the links */
-        background-color: #eee; /* Background for the horizontal nav */
+    /* Desktop horizontal navigation (old #collection-nav, now collection-nav-sidebar behavior copied) */
+    #collection-nav-sidebar { /* Now this ID controls the desktop horizontal nav */
+        display: flex;
+        justify-content: center;
+        background-color: #eee;
         padding: 10px 0;
         border-bottom: 1px solid #ddd;
     }
 
-    #collection-nav li {
-        border-bottom: none; /* Remove bottom border for list items */
+    #collection-nav-sidebar li {
+        border-bottom: none;
     }
 
-    #collection-nav a {
-        padding: 10px 20px; /* Adjust padding for horizontal links */
+    #collection-nav-sidebar a {
+        padding: 10px 20px;
         border-radius: 5px;
-        margin: 0 5px; /* Space between links */
+        margin: 0 5px;
     }
 
-    #collection-nav a:hover,
-    #collection-nav a.active {
+    #collection-nav-sidebar a:hover,
+    #collection-nav-sidebar a.active {
         background-color: #ddd;
         color: #a04000;
+    }
+
+    /* Hide mobile horizontal nav on desktop */
+    #mobile-horizontal-nav {
+        display: none;
     }
 }
