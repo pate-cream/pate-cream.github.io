@@ -11,13 +11,85 @@ body {
 header {
     background-color: #333;
     color: #fff;
-    padding: 20px 0;
+    padding: 20px; /* Adjust padding for better spacing */
     text-align: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: flex; /* Use flexbox for header content */
+    justify-content: space-between; /* Space out title and hamburger */
+    align-items: center;
 }
 
 h1 {
     margin: 0;
+    flex-grow: 1; /* Allow title to take available space */
+    text-align: center; /* Center the title */
+}
+
+/* Hamburger menu button for mobile */
+.hamburger-menu {
+    display: none; /* Hidden by default, shown on mobile */
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2em;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+/* Close button for side menu */
+.close-menu {
+    display: none; /* Hidden by default, shown on mobile sidebar */
+    background: none;
+    border: none;
+    color: #333; /* Color for close button in sidebar */
+    font-size: 2em;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+/* Sidebar Navigation (Mobile First) */
+#sidebar-menu {
+    position: fixed;
+    top: 0;
+    left: -250px; /* Off-screen by default */
+    width: 250px;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    transition: left 0.3s ease; /* Smooth transition for opening/closing */
+    z-index: 1000;
+    padding-top: 60px; /* Space for close button */
+}
+
+#sidebar-menu.open {
+    left: 0; /* Slide in when open */
+}
+
+#collection-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#collection-nav li {
+    border-bottom: 1px solid #eee;
+}
+
+#collection-nav a {
+    display: block;
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+#collection-nav a:hover,
+#collection-nav a.active {
+    background-color: #f0f0f0;
+    color: #a04000;
 }
 
 #menu-container {
@@ -34,16 +106,48 @@ h1 {
     padding: 20px;
 }
 
-.collection h2 {
-    color: #a04000; /* Distinct color for food sections */
-    margin-top: 0;
+/* Styles for the new collection header (dropdown toggle) */
+.collection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
     padding-bottom: 10px;
     border-bottom: 2px solid #eee;
+    margin-bottom: 15px; /* Space between header and content */
 }
+
+.collection-header h2 {
+    color: #a04000;
+    margin: 0; /* Remove default margin from h2 */
+}
+
+.toggle-icon {
+    font-size: 1.5em;
+    color: #a04000;
+    transition: transform 0.3s ease; /* Smooth rotation */
+}
+
+.toggle-icon.rotated {
+    transform: rotate(180deg); /* Rotate icon when expanded */
+}
+
+/* Styles for the dropdown content */
+.dishes-grid-wrapper {
+    max-height: 0; /* Initially hidden */
+    overflow: hidden; /* Hide overflow content */
+    transition: max-height 0.5s ease-out; /* Smooth transition for expand/collapse */
+}
+
+.dishes-grid-wrapper.expanded {
+    max-height: 2000px; /* A large enough value to show all content when expanded */
+    transition: max-height 0.7s ease-in; /* Faster transition when expanding */
+}
+
 
 .dishes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); /* القيمة التي تم تعديلها مسبقاً */
     gap: 20px;
 }
 
@@ -65,12 +169,24 @@ h1 {
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-.dish-item img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
+.dish-image-wrapper {
+    width: 80%; /* القيمة التي تم تعديلها مسبقاً */
+    padding-bottom: 80%; /* القيمة التي تم تعديلها مسبقاً */
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
     border-bottom: 1px solid #eee;
     margin-bottom: 10px;
+}
+
+.dish-item img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 
 .dish-item h3 {
@@ -84,7 +200,7 @@ h1 {
     color: #666;
     padding: 0 15px;
     line-height: 1.5;
-    flex-grow: 1; /* To expand description to fill available space */
+    flex-grow: 1;
 }
 
 .dish-item .price {
@@ -106,5 +222,63 @@ footer {
 @media (max-width: 768px) {
     .dishes-grid {
         grid-template-columns: 1fr; /* Single column layout on small screens */
+    }
+
+    .hamburger-menu, .close-menu {
+        display: block; /* Show hamburger and close buttons on small screens */
+    }
+
+    /* Hide horizontal navigation on mobile */
+    #collection-nav {
+        display: block; /* Ensure it's block within the sidebar */
+    }
+}
+
+/* Desktop Styles (above 768px) */
+@media (min-width: 769px) {
+    header {
+        justify-content: center; /* Center header content on desktop */
+    }
+
+    .hamburger-menu {
+        display: none; /* Hide hamburger menu on desktop */
+    }
+
+    #sidebar-menu {
+        position: static; /* Take it out of fixed positioning */
+        width: auto; /* Auto width */
+        height: auto; /* Auto height */
+        box-shadow: none; /* No shadow */
+        background-color: transparent; /* Transparent background */
+        padding-top: 0;
+        transition: none; /* No transition needed */
+    }
+
+    .close-menu {
+        display: none; /* Hide close button on desktop */
+    }
+
+    #collection-nav {
+        display: flex; /* Make navigation horizontal */
+        justify-content: center; /* Center the links */
+        background-color: #eee; /* Background for the horizontal nav */
+        padding: 10px 0;
+        border-bottom: 1px solid #ddd;
+    }
+
+    #collection-nav li {
+        border-bottom: none; /* Remove bottom border for list items */
+    }
+
+    #collection-nav a {
+        padding: 10px 20px; /* Adjust padding for horizontal links */
+        border-radius: 5px;
+        margin: 0 5px; /* Space between links */
+    }
+
+    #collection-nav a:hover,
+    #collection-nav a.active {
+        background-color: #ddd;
+        color: #a04000;
     }
 }
