@@ -19,9 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener for navigation clicks (delegated to parent ul)
     function handleNavigationClick(event) {
         event.preventDefault();
-        const clickedLink = event.target;
+        //const clickedLink = event.target;
+		const clickedLink = event.target.closest('a');
 
-        if (clickedLink.tagName !== 'A') return;
+        //if (clickedLink.tagName !== 'A') return;
+		if (!clickedLink) return;
 
         // Remove 'active' class from all links in BOTH navs
         document.querySelectorAll('#collection-nav-sidebar a, #collection-nav-horizontal a').forEach(link => {
