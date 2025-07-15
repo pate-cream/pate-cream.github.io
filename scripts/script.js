@@ -19,24 +19,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener for navigation clicks (delegated to parent ul)
     function handleNavigationClick(event) {
         event.preventDefault();
-        //const clickedLink = event.target;
-		const clickedLink = event.target.closest('a');
+        const clickedLink = event.target.closest('a');
 
-        //if (clickedLink.tagName !== 'A') return;
-		if (!clickedLink) return;
+        if (!clickedLink) return;
 
         // Remove 'active' class from all links in BOTH navs
         document.querySelectorAll('#collection-nav-sidebar a, #collection-nav-horizontal a').forEach(link => {
             link.classList.remove('active');
         });
 
-        const selectedCollectionName = clickedLink.dataset.collection; // e.g., "All Items" or "Collection 1"
-        const normalizedSelectedCollectionName = selectedCollectionName.toLowerCase(); // e.g., "all items" or "collection 1"
+        const selectedCollectionName = clickedLink.dataset.collection;
+        const normalizedSelectedCollectionName = selectedCollectionName.toLowerCase();
 
-        currentView = selectedCollectionName; // Keep original for display if needed (e.g., in breadcrumbs or other UI)
+        currentView = selectedCollectionName;
 
         // Add 'active' class to the clicked link in BOTH navs
-        // We still use the original selectedCollectionName here to match the data-collection attribute
         document.querySelectorAll(`[data-collection="${selectedCollectionName}"]`).forEach(link => {
             link.classList.add('active');
         });
@@ -46,16 +43,13 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleSidebar();
         }
 
-        // *** هذا هو الجزء المعدّل والمهم ***
-        if (normalizedSelectedCollectionName === 'all items') { // يجب أن نقارن بـ 'all items' لأن data-collection="All Items" تحول إلى 'all items'
+        if (normalizedSelectedCollectionName === 'all items') {
             console.log('--- Handling "All Items" click (normalized) ---');
             console.log('Passing allMenuData:', allMenuData);
-            displayMenu(allMenuData, 'all'); // viewType يبقى 'all' ليتطابق مع المنطق السابق
+            displayMenu(allMenuData, 'all');
         } else {
             console.log(`--- Handling "${selectedCollectionName}" click ---`);
             const filteredCollection = allMenuData.filter(
-                // هنا يجب أن نقارن collection.collectionName بـ selectedCollectionName الأصلية (Case-sensitive as per data)
-                // أو إذا كنا نود مقارنة غير حساسة لحالة الأحرف دائماً، نستخدم toLowerCase() على collection.collectionName أيضاً
                 collection => collection.collectionName === selectedCollectionName
             );
             console.log('Filtered data:', filteredCollection);
@@ -83,35 +77,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function populateNavigation(menuData)  {
+    function populateNavigation(menuData) {
         collectionNavSidebar.innerHTML = '';
         collectionNavHorizontal.innerHTML = '';
 
         // Helper function to create a navigation link
-        // أضفت وسيط 'isMobileHorizontal' لإنشاء الأيقونات فقط للشريط الأفقي
-        function createNavLink(collectionName, isMobileHorizontal = false) {
+        // أضفنا الآن وسيط "collectionIconPath" لتمرير مسار الأيقونة
+        function createNavLink(collectionName, isMobileHorizontal = false, collectionIconPath = '') {
             const li = document.createElement('li');
             const link = document.createElement('a');
             link.href = '#';
             link.textContent = collectionName;
             link.dataset.collection = collectionName;
 
-            // إضافة الأيقونات بناءً على اسم الكولكشن إذا كانت للشريط الأفقي
             if (isMobileHorizontal) {
-                let iconSrc = ''; // Default or specific icon for 'All categories'
+                let iconSrc = collectionIconPath; // استخدم المسار الذي تم تمريره مباشرة
+
+                // معالجة حالة "All Items" بشكل خاص لأنها ليست جزءًا من بيانات JSON
                 if (collectionName === 'All Items') {
-                    iconSrc = 'images/col1.png'; // أيقونة لكل الفئات
+                    iconSrc = 'images/col1.png'; // أيقونة افتراضية لـ "All categories"
                     link.textContent = 'All categories'; // تغيير النص إلى "All categories"
-                } else if (collectionName === 'Collection 1') { // مثال: أيقونة للحلويات
-                    iconSrc = 'images/col1.png';
-                } else if (collectionName === 'Collection 2') { // مثال: أيقونة للكاسات
-                    iconSrc = 'images/col1.png';
                 }
-				else if (collectionName === 'Collection 3') { // مثال: أيقونة للكاسات
-                    iconSrc = 'images/col1.png';
-                }
-				
-                // يمكنك إضافة المزيد من الشروط هنا لكل كولكشن لديه أيقونة محددة
 
                 if (iconSrc) {
                     const iconImg = document.createElement('img');
@@ -121,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     link.prepend(iconImg); // أضف الأيقونة قبل النص
                 }
             }
-
 
             // Set 'active' class based on the currentView
             if (collectionName === 'All Items' && currentView === 'all') {
@@ -134,16 +119,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Add "All Items" to both navigation lists
+        // لا توجد أيقونة من JSON لـ "All Items"، لذا نمرر المسار يدوياً أو نتركه فارغاً ليعالجه الشرط الداخلي
         collectionNavSidebar.appendChild(createNavLink('All Items'));
-        // تمرير true لـ isMobileHorizontal هنا لإنشاء الأيقونات
         collectionNavHorizontal.appendChild(createNavLink('All Items', true));
 
 
         // Add links for each collection to both navigation lists
         menuData.forEach(collection => {
             collectionNavSidebar.appendChild(createNavLink(collection.collectionName));
-            // تمرير true لـ isMobileHorizontal هنا لإنشاء الأيقونات
-            collectionNavHorizontal.appendChild(createNavLink(collection.collectionName, true));
+            // هنا نمرر collection.icon الذي يأتي من ملف JSON
+            collectionNavHorizontal.appendChild(createNavLink(collection.collectionName, true, collection.icon));
         });
     }
 
@@ -161,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (viewType === 'all') {
                 isExpandedInitially = false; // All collections collapsed in 'All Items' view
-            } else if (collection.collectionName === viewType) { // This comparison needs to be case-sensitive with actual collectionName
+            } else if (collection.collectionName === viewType) {
                 isExpandedInitially = true; // The selected specific collection is expanded
             }
 
@@ -246,4 +231,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     fetchMenuData();
+	const currentYearSpan = document.getElementById('current-year');
+    if (currentYearSpan) {
+        const currentYear = new Date().getFullYear();
+        currentYearSpan.textContent = currentYear;
+    }
 });
