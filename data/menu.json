@@ -1,7 +1,7 @@
 [
   {
     "collectionName": "Collection 1",
-    "items": [
+    "icon": "images/col1.png",  "items": [
       {
         "name": "Strawberries Crepe",
         "description": "Nutella & Fresh Strawberries Crepe",
@@ -18,7 +18,7 @@
   },
   {
     "collectionName": "Collection 2",
-    "items": [
+    "icon": "images/col1.png",  "items": [
       {
         "name": "Strawberries Crepe",
         "description": "Nutella & Fresh Strawberries Crepe",
@@ -35,7 +35,7 @@
   },
   {
     "collectionName": "Collection 3",
-    "items": [
+    "icon": "images/col1.png",  "items": [
       {
         "name": "Strawberries Crepe",
         "description": "Nutella & Fresh Strawberries Crepe",
